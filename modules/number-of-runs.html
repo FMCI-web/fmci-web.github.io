@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Calculate the distribution of success runs, failure runs, or total runs in a binary sequence.">
+<title>Number of Runs — FMCI Web App Guide</title>
+<link rel="stylesheet" href="../assets/module-pages.css">
+</head>
+<body>
+<header class="topbar">
+  <nav class="nav">
+    <a class="brand" href="../index.html"><span class="brand-mark"></span><span>FMCI Web App</span></a>
+    <div class="navlinks"><a href="../index.html">Home</a><a href="../index.html#methods">All Modules</a><a class="launch" href="https://unshaven-energy-verify.ngrok-free.dev/webapps/home/session.html?app=WuWebAppDesignerWeb2" target="_blank" rel="noopener noreferrer">Launch App ↗</a></div>
+  </nav>
+</header>
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../index.html#methods">Modules</a> / Number of Runs</div>
+      <div class="eyebrow">Binary run-count distribution</div>
+      <div class="title-row"><div class="module-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div><h1>Number of Runs</h1></div>
+      <p class="hero-summary">Calculate the distribution of success runs, failure runs, or total runs in a binary sequence.</p>
+      <div class="hero-actions"><a class="btn btn-primary" href="https://unshaven-energy-verify.ngrok-free.dev/webapps/home/session.html?app=WuWebAppDesignerWeb2" target="_blank" rel="noopener noreferrer">Open the Web App ↗</a><a class="btn btn-secondary" href="#guide">Read the guide ↓</a></div>
+    </div>
+    <aside class="formula-card"><div class="small">Core result</div><div class="formula">PMF and CDF of the selected run count</div><div class="formula-note">Exact finite-sample calculations based on finite Markov chain imbedding.</div></aside>
+  </div>
+</section>
+<main class="content" id="guide">
+  <div class="overview-grid">
+    <div class="overview-card"><div class="label">What it computes</div><p>PMF and CDF of the selected run count</p></div>
+    <div class="overview-card"><div class="label">Supported models</div><p>Independent Bernoulli or two-state Markov-dependent trials</p></div>
+    <div class="overview-card"><div class="label">Main inputs</div><p>n, run count k, run type, dependence type, probability parameters</p></div>
+  </div>
+  <div class="layout">
+    <aside class="toc"><h2>On this page</h2><a href="#single-window-web-app-note">Single-window web-app note</a><a href="#purpose">Purpose</a><a href="#run-types">Run Types</a><a href="#dependence-types">Dependence Types</a><a href="#inputs">Inputs</a><a href="#independent-case">Independent Case</a><a href="#markov-dependent-case">Markov-Dependent Case</a><a href="#button-behavior">Button Behavior</a><a href="#how-to-use-the-app">How To Use The App</a><a href="#example-1-independent-success-runs">Example 1: Independent Success Runs</a><a href="#example-2-independent-failure-runs">Example 2: Independent Failure Runs</a><a href="#example-3-independent-total-runs">Example 3: Independent Total Runs</a><a href="#example-4-markov-success-runs">Example 4: Markov Success Runs</a><a href="#example-5-markov-total-runs">Example 5: Markov Total Runs</a><a href="#understanding-the-results">Understanding The Results</a><a href="#mean-button">Mean Button</a><a href="#eigvalue-vector-button">Eigvalue/Vector Button</a><a href="#common-mistakes-to-avoid">Common Mistakes To Avoid</a><a href="#recommended-defaults">Recommended Defaults</a><div class="source-files"><h2>MATLAB routines</h2><span>fmci_unconditional_success_runs.m</span><span>fmci_unconditional_success_runs_eig.m</span></div></aside>
+    <article class="guide"><section class="section-card" id="single-window-web-app-note">
+<details open>
+<summary>Single-window web-app note</summary>
+<div class="section-body"><p>The original desktop instructions sometimes refer to buttons that open separate input windows. In this single-window web version, enter those same values directly in the text boxes or tables on the current tab. The mathematical meaning of the inputs and outputs is unchanged.</p></div>
+</details>
+</section><section class="section-card" id="purpose">
+<details open>
+<summary>Purpose</summary>
+<div class="section-body"><p>This app computes the distribution of the number of runs in a binary sequence of length n.</p>
+<pre class="formula-block">The two possible states are:
+    0 = failure
+    1 = success</pre>
+<pre class="formula-block">The app supports:
+    1. Success runs only
+    2. Failure runs only
+    3. Total runs of both 0s and 1s</pre>
+<pre class="formula-block">The app also supports two dependence assumptions:
+    1. Independent Bernoulli trials
+    2. Two-state Markov-dependent trials</pre>
+<pre class="formula-block">The computational function is:
+    [pmf, cdf] = fmci_unconditional_success_runs(n, trialType, params, mode)</pre>
+<pre class="formula-block">where:
+    trialType = &#x27;iid&#x27; or &#x27;markov&#x27;
+    mode      = &#x27;ones&#x27;, &#x27;zeros&#x27;, or &#x27;total&#x27;</pre></div>
+</details>
+</section><section class="section-card" id="run-types">
+<details>
+<summary>Run Types</summary>
+<div class="section-body"><p class="guide-label">The app should have one radio-button group for run type:</p>
+<pre class="formula-block">    Success
+        Counts runs of 1s only.
+        The app uses mode = &#x27;ones&#x27;.</pre>
+<pre class="formula-block">    Failure
+        Counts runs of 0s only.
+        The app uses mode = &#x27;zeros&#x27;.</pre>
+<pre class="formula-block">    Both
+        Counts total runs of 0s and 1s combined.
+        The app uses mode = &#x27;total&#x27;.</pre>
+<pre class="formula-block">Example sequence:
+    0 1 1 0 1 0 1 1 1 0</pre>
+<pre class="formula-block">Success runs:
+    11, 1, 111
+    Number of success runs = 3</pre>
+<pre class="formula-block">Failure runs:
+    0, 0, 0, 0
+    Number of failure runs = 4</pre>
+<pre class="formula-block">Total runs:
+    0 | 11 | 0 | 1 | 0 | 111 | 0
+    Total number of runs = 7</pre></div>
+</details>
+</section><section class="section-card" id="dependence-types">
+<details>
+<summary>Dependence Types</summary>
+<div class="section-body"><p class="guide-label">The app should have a separate radio-button group for:</p>
+<pre class="formula-block">    Independent
+    Markov dependent</pre>
+<p>These must be separate from the Success / Failure / Both radio buttons. This is important because the user must be able to select, for example:</p>
+<pre class="formula-block">    Success + Independent
+    Failure + Independent
+    Both + Independent
+    Success + Markov dependent
+    Failure + Markov dependent
+    Both + Markov dependent</pre>
+<p>If all five radio buttons are placed into one group, the app cannot distinguish the run type from the dependence type.</p></div>
+</details>
+</section><section class="section-card" id="inputs">
+<details>
+<summary>Inputs</summary>
+<div class="section-body"><pre class="formula-block">Length of the Sequence
+    Enter n, the sequence length.</pre>
+<pre class="example-block">    Example:
+        n = 20</pre>
+<pre class="formula-block">Number of runs
+    Enter k, the number of runs of interest.</pre>
+<pre class="formula-block">    The app reports:
+        P(R_n = k)
+        P(R_n &lt;= k)
+        P(R_n &gt;= k)</pre>
+<pre class="formula-block">    Here R_n means the selected run statistic.</pre></div>
+</details>
+</section><section class="section-card" id="independent-case">
+<details>
+<summary>Independent Case</summary>
+<div class="section-body"><p>Choose Independent when X_1, X_2, ..., X_n are iid Bernoulli trials.</p>
+<pre class="formula-block">For the independent case, click:
+    Enter the probability Pi</pre>
+<pre class="formula-block">Enter:
+    Pi = [P(X=0), P(X=1)]</pre>
+<pre class="example-block">Example:
+    Pi = [0.6 0.4]</pre>
+<pre class="formula-block">This means:
+    P(X=0) = 0.6
+    P(X=1) = 0.4</pre>
+<pre class="formula-block">The app passes the success probability to the function as:
+    trialType = &#x27;iid&#x27;
+    params    = Pi(2)</pre>
+<p class="guide-label">For Pi = [0.6 0.4], params = 0.4.</p></div>
+</details>
+</section><section class="section-card" id="markov-dependent-case">
+<details>
+<summary>Markov-Dependent Case</summary>
+<div class="section-body"><p>Choose Markov dependent when the sequence is a two-state Markov chain on {0,1}.</p>
+<p class="guide-label">For the Markov-dependent case, enter two objects:</p>
+<ol><li>Initial Pi</li><li>Transition P</li></ol>
+<pre class="formula-block">Initial Pi
+    Click:
+        Enter the initial Pi</pre>
+<pre class="formula-block">    Enter:
+        initialPi = [P(X_1=0), P(X_1=1)]</pre>
+<pre class="example-block">    Example:
+        initialPi = [0.7 0.3]</pre>
+<pre class="formula-block">    This means:
+        P(X_1=0) = 0.7
+        P(X_1=1) = 0.3</pre>
+<pre class="formula-block">Transition P
+    Click:
+        Enter transition P</pre>
+<pre class="formula-block">    Enter a 2-by-2 transition matrix:
+        P = [P00 P01
+             P10 P11]</pre>
+<pre class="formula-block">    where:
+        P00 = P(X_t=0 | X_{t-1}=0)
+        P01 = P(X_t=1 | X_{t-1}=0)
+        P10 = P(X_t=0 | X_{t-1}=1)
+        P11 = P(X_t=1 | X_{t-1}=1)</pre>
+<pre class="example-block">    Example:
+        P = [0.8 0.2
+             0.3 0.7]</pre>
+<pre class="formula-block">For the Markov-dependent case, the app passes:
+    trialType = &#x27;markov&#x27;
+    params = [initialPi(2), P(1,2), P(2,2)]</pre>
+<pre class="formula-block">That is:
+    params = [p1, P01, P11]</pre>
+<pre class="formula-block">where:
+    p1  = P(X_1 = 1)
+    P01 = P(X_t = 1 | X_{t-1} = 0)
+    P11 = P(X_t = 1 | X_{t-1} = 1)</pre></div>
+</details>
+</section><section class="section-card" id="button-behavior">
+<details>
+<summary>Button Behavior</summary>
+<div class="section-body"><pre class="formula-block">Independent selected:
+    Show: Enter the probability Pi
+    Hide: Enter the initial Pi
+    Hide: Enter transition P</pre>
+<pre class="formula-block">Markov dependent selected:
+    Hide: Enter the probability Pi
+    Show: Enter the initial Pi
+    Show: Enter transition P</pre></div>
+</details>
+</section><section class="section-card" id="how-to-use-the-app">
+<details>
+<summary>How To Use The App</summary>
+<div class="section-body"><pre class="example-block">Step 1. Click Clear all items.</pre>
+<pre class="example-block">Step 2. Enter Length of the Sequence.
+    Example:
+        20</pre>
+<pre class="example-block">Step 3. Enter Number of runs.
+    Example:
+        3</pre>
+<pre class="example-block">Step 4. Choose the run type:
+    Success, Failure, or Both.</pre>
+<pre class="example-block">Step 5. Choose the dependence type:
+    Independent or Markov dependent.</pre>
+<pre class="example-block">Step 6A. If Independent is selected:
+    Click Enter the probability Pi.
+    Enter Pi = [P(X=0), P(X=1)].
+    Click Save.</pre>
+<pre class="example-block">Step 6B. If Markov dependent is selected:
+    Click Enter the initial Pi.
+    Enter initialPi = [P(X_1=0), P(X_1=1)].
+    Click Save.</pre>
+<pre class="formula-block">    Then click Enter transition P.
+    Enter the 2-by-2 transition matrix.
+    Click Save.</pre>
+<pre class="example-block">Step 7. Click Calculate the Probability.</pre>
+<pre class="example-block">Step 8. Optional: click Mean.
+    This computes E(R_n) from the full pmf.</pre>
+<pre class="example-block">Step 9. Optional: click EigValue/vector.
+    This displays eigenvalue/eigenvector information.</pre></div>
+</details>
+</section><section class="section-card" id="example-1-independent-success-runs">
+<details>
+<summary>Example 1: Independent Success Runs</summary>
+<div class="section-body"><pre class="example-block">Question:
+    In 20 iid Bernoulli trials with P(X=1)=0.4, what is the
+    probability of exactly 3 success runs?</pre>
+<pre class="example-block">Inputs:
+    Length of the Sequence = 20
+    Number of runs         = 3
+    Run type               = Success
+    Dependence type         = Independent
+    Pi                      = [0.6 0.4]</pre>
+<pre class="formula-block">Function call used by the app:
+    [pmf, cdf] = fmci_unconditional_success_runs(20, &#x27;iid&#x27;, 0.4, &#x27;ones&#x27;)</pre>
+<pre class="example-block">Output:
+    P(R_20 = 3)
+    P(R_20 &lt;= 3)
+    P(R_20 &gt;= 3)</pre></div>
+</details>
+</section><section class="section-card" id="example-2-independent-failure-runs">
+<details>
+<summary>Example 2: Independent Failure Runs</summary>
+<div class="section-body"><pre class="example-block">Question:
+    In 20 iid Bernoulli trials with P(X=0)=0.6, what is the
+    probability of exactly 4 failure runs?</pre>
+<pre class="example-block">Inputs:
+    Length of the Sequence = 20
+    Number of runs         = 4
+    Run type               = Failure
+    Dependence type         = Independent
+    Pi                      = [0.6 0.4]</pre>
+<pre class="formula-block">Function call used by the app:
+    [pmf, cdf] = fmci_unconditional_success_runs(20, &#x27;iid&#x27;, 0.4, &#x27;zeros&#x27;)</pre>
+<p>Because mode = &#x27;zeros&#x27;, the function computes failure runs.</p></div>
+</details>
+</section><section class="section-card" id="example-3-independent-total-runs">
+<details>
+<summary>Example 3: Independent Total Runs</summary>
+<div class="section-body"><pre class="example-block">Question:
+    In 20 iid Bernoulli trials, what is the probability of
+    exactly 8 total runs?</pre>
+<pre class="example-block">Inputs:
+    Length of the Sequence = 20
+    Number of runs         = 8
+    Run type               = Both
+    Dependence type         = Independent
+    Pi                      = [0.5 0.5]</pre>
+<pre class="formula-block">Function call used by the app:
+    [pmf, cdf] = fmci_unconditional_success_runs(20, &#x27;iid&#x27;, 0.5, &#x27;total&#x27;)</pre></div>
+</details>
+</section><section class="section-card" id="example-4-markov-success-runs">
+<details>
+<summary>Example 4: Markov Success Runs</summary>
+<div class="section-body"><pre class="example-block">Question:
+    In a two-state Markov chain, what is the probability of
+    exactly 3 success runs in 20 trials?</pre>
+<pre class="example-block">Inputs:
+    Length of the Sequence = 20
+    Number of runs         = 3
+    Run type               = Success
+    Dependence type         = Markov dependent</pre>
+<pre class="formula-block">Initial distribution:
+    initialPi = [0.7 0.3]</pre>
+<pre class="example-block">Transition matrix:
+    P = [0.8 0.2
+         0.3 0.7]</pre>
+<pre class="formula-block">The app forms:
+    params = [0.3, 0.2, 0.7]</pre>
+<pre class="formula-block">Function call used by the app:
+    [pmf, cdf] = fmci_unconditional_success_runs(20, &#x27;markov&#x27;, [0.3 0.2 0.7], &#x27;ones&#x27;)</pre></div>
+</details>
+</section><section class="section-card" id="example-5-markov-total-runs">
+<details>
+<summary>Example 5: Markov Total Runs</summary>
+<div class="section-body"><pre class="example-block">Question:
+    In a two-state Markov chain, what is the probability of
+    exactly 10 total runs in 20 trials?</pre>
+<pre class="example-block">Inputs:
+    Length of the Sequence = 20
+    Number of runs         = 10
+    Run type               = Both
+    Dependence type         = Markov dependent</pre>
+<pre class="formula-block">Initial distribution:
+    initialPi = [0.5 0.5]</pre>
+<pre class="example-block">Transition matrix:
+    P = [0.9 0.1
+         0.2 0.8]</pre>
+<pre class="formula-block">The app forms:
+    params = [0.5, 0.1, 0.8]</pre>
+<pre class="formula-block">Function call used by the app:
+    [pmf, cdf] = fmci_unconditional_success_runs(20, &#x27;markov&#x27;, [0.5 0.1 0.8], &#x27;total&#x27;)</pre></div>
+</details>
+</section><section class="section-card" id="understanding-the-results">
+<details>
+<summary>Understanding The Results</summary>
+<div class="section-body"><p class="guide-label">The app displays three probabilities.</p>
+<pre class="formula-block">    P(R_n = k)
+        Probability that the number of runs is exactly k.</pre>
+<pre class="formula-block">    P(R_n &lt;= k)
+        Probability that the number of runs is at most k.</pre>
+<pre class="formula-block">    P(R_n &gt;= k)
+        Probability that the number of runs is at least k.</pre>
+<p>For Success mode, R_n counts success runs. For Failure mode, R_n counts failure runs. For Both mode, R_n counts total runs.</p></div>
+</details>
+</section><section class="section-card" id="mean-button">
+<details>
+<summary>Mean Button</summary>
+<div class="section-body"><pre class="formula-block">The Mean button computes:
+    E(R_n) = sum_k k * P(R_n = k)</pre>
+<p>It uses the same current selections and probability inputs.</p></div>
+</details>
+</section><section class="section-card" id="eigvalue-vector-button">
+<details>
+<summary>Eigvalue/Vector Button</summary>
+<div class="section-body"><p>The EigValue/vector button is optional.</p>
+<p>It displays the largest eigenvalue and right eigenvector of the FMCI transition matrix for the current case when available.</p>
+<p>The app should write this output into one scrollable text area inside the eigenvalue/vector panel, so the eigenvalue and eigenvector text do not overlap.</p></div>
+</details>
+</section><section class="section-card" id="common-mistakes-to-avoid">
+<details>
+<summary>Common Mistakes To Avoid</summary>
+<div class="section-body"><p>1. Do not put all five radio buttons into one group. Use one group for Success / Failure / Both and another group for Independent / Markov dependent.</p>
+<p>2. Do not reverse Pi. Pi must be [P(X=0), P(X=1)].</p>
+<ol><li>Independent Pi must have exactly two entries and sum to 1.</li></ol>
+<ol><li>Markov initialPi must have exactly two entries and sum to 1.</li></ol>
+<ol><li>Each row of the Markov transition matrix must sum to 1.</li></ol>
+<p>6. For success/failure runs, the maximum possible number of runs is ceil(n/2).</p>
+<ol><li>For total runs, the maximum possible number of runs is n.</li></ol>
+<p>8. If you change from Independent to Markov dependent, enter initial Pi and transition P before calculating.</p></div>
+</details>
+</section><section class="section-card" id="recommended-defaults">
+<details>
+<summary>Recommended Defaults</summary>
+<div class="section-body"><pre class="formula-block">Independent default:
+    Pi = [0.5 0.5]</pre>
+<pre class="formula-block">Markov initial default:
+    initialPi = [0.5 0.5]</pre>
+<pre class="formula-block">Markov transition default:
+    P = [0.5 0.5
+         0.5 0.5]</pre></div>
+</details>
+</section>
+      <nav class="page-nav"><a href="longest-run.html"><small>Previous module</small><strong>← Longest Run</strong></a><a href="matching-probability.html"><small>Next module</small><strong>Matching Probability →</strong></a></nav>
+    </article>
+  </div>
+</main>
+<footer class="footer">FMCI Web App module guide · <a href="../index.html">Return to the home page</a></footer>
+</body>
+</html>

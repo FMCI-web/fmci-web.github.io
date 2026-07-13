@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Compute distributions for the longest consecutive run of a selected state or of any identical state.">
+<title>Longest Run — FMCI Web App Guide</title>
+<link rel="stylesheet" href="../assets/module-pages.css">
+</head>
+<body>
+<header class="topbar">
+  <nav class="nav">
+    <a class="brand" href="../index.html"><span class="brand-mark"></span><span>FMCI Web App</span></a>
+    <div class="navlinks"><a href="../index.html">Home</a><a href="../index.html#methods">All Modules</a><a class="launch" href="https://unshaven-energy-verify.ngrok-free.dev/webapps/home/session.html?app=WuWebAppDesignerWeb2" target="_blank" rel="noopener noreferrer">Launch App ↗</a></div>
+  </nav>
+</header>
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../index.html#methods">Modules</a> / Longest Run</div>
+      <div class="eyebrow">Consecutive-state behavior</div>
+      <div class="title-row"><div class="module-icon"><svg viewBox="0 0 24 24"><path d="M4 18l5-6 4 3 7-9"/><path d="M16 6h4v4"/></svg></div><h1>Longest Run</h1></div>
+      <p class="hero-summary">Compute distributions for the longest consecutive run of a selected state or of any identical state.</p>
+      <div class="hero-actions"><a class="btn btn-primary" href="https://unshaven-energy-verify.ngrok-free.dev/webapps/home/session.html?app=WuWebAppDesignerWeb2" target="_blank" rel="noopener noreferrer">Open the Web App ↗</a><a class="btn btn-secondary" href="#guide">Read the guide ↓</a></div>
+    </div>
+    <aside class="formula-card"><div class="small">Core result</div><div class="formula">P(Lₙ &lt; L), P(Lₙ = L), and tail probabilities</div><div class="formula-note">Exact finite-sample calculations based on finite Markov chain imbedding.</div></aside>
+  </div>
+</section>
+<main class="content" id="guide">
+  <div class="overview-grid">
+    <div class="overview-card"><div class="label">What it computes</div><p>P(Lₙ &lt; L), P(Lₙ = L), and tail probabilities</p></div>
+    <div class="overview-card"><div class="label">Supported models</div><p>Unconditional categorical trials and conditional binary trials</p></div>
+    <div class="overview-card"><div class="label">Main inputs</div><p>n, number of states, run threshold L, probability vector or conditional count N</p></div>
+  </div>
+  <div class="layout">
+    <aside class="toc"><h2>On this page</h2><a href="#single-window-web-app-note">Single-window web-app note</a><a href="#purpose">Purpose</a><a href="#run-modes">Run Modes</a><a href="#inputs">Inputs</a><a href="#how-to-use-the-app-unconditional-case">How To Use The App: Unconditional Case</a><a href="#how-to-use-the-app-conditional-case">How To Use The App: Conditional Case</a><a href="#understanding-the-results">Understanding The Results</a><a href="#example-1-unconditional-two-state-all-the-states">Example 1: Unconditional, Two-State, All The States</a><a href="#example-2-unconditional-three-state-selected-state">Example 2: Unconditional, Three-State, Selected State</a><a href="#example-3-unconditional-four-state-unequal-probabilities">Example 3: Unconditional, Four-State, Unequal Probabilities</a><a href="#example-4-conditional-two-state-selected-state">Example 4: Conditional, Two-State, Selected State</a><a href="#common-mistakes-to-avoid">Common Mistakes To Avoid</a><a href="#eigvalue-vector-button">Eigvalue/Vector Button</a><a href="#clearing-the-app">Clearing The App</a><a href="#closing-the-app">Closing The App</a><div class="source-files"><h2>MATLAB routines</h2><span>fmci_longest_run_dist.m</span><span>Fast_Cond_Longest_Run.m</span></div></aside>
+    <article class="guide"><section class="section-card" id="single-window-web-app-note">
+<details open>
+<summary>Single-window web-app note</summary>
+<div class="section-body"><p>The original desktop instructions sometimes refer to buttons that open separate input windows. In this single-window web version, enter those same values directly in the text boxes or tables on the current tab. The mathematical meaning of the inputs and outputs is unchanged.</p></div>
+</details>
+</section><section class="section-card" id="purpose">
+<details open>
+<summary>Purpose</summary>
+<div class="section-body"><p>This app computes probabilities for L_n, the longest run length in a sequence of trials.</p>
+<p class="guide-label">The app supports two probability cases:</p>
+<pre class="formula-block">1. Unconditional case
+   The trials are independent m-state categorical trials.
+   A probability vector Pi is used:
+       Pi = [P(X=1), P(X=2), ..., P(X=m)]</pre>
+<pre class="formula-block">2. Conditional case
+   This case is only for two-state trials.
+   The app conditions on the total number N of occurrences of
+   the selected state in the sequence.
+   The conditional calculation uses:
+       [p, pn1] = Fast_Cond_Longest_Run(n, L, N)
+   where p = P(L_n &lt; L | N).</pre></div>
+</details>
+</section><section class="section-card" id="run-modes">
+<details>
+<summary>Run Modes</summary>
+<div class="section-body"><p class="guide-label">The app also supports two run modes in the unconditional case:</p>
+<p>1. Selected states Computes the longest run of one specified state only. Example: longest run of state 2.</p>
+<p>2. All the states Computes the longest run of any identical consecutive state. This means the maximum run length among all states.</p>
+<p>For the conditional case, the app uses selected-state logic only. Because Fast_Cond_Longest_Run is a binary conditional function, the conditional case is restricted to m = 2.</p></div>
+</details>
+</section><section class="section-card" id="inputs">
+<details>
+<summary>Inputs</summary>
+<div class="section-body"><pre class="formula-block">m-state trials
+    Enter the number of possible states, m.
+    The states are labeled 1, 2, ..., m.</pre>
+<pre class="formula-block">    In the unconditional case:
+        m can be 2, 3, 4, ...</pre>
+<pre class="formula-block">    In the conditional case:
+        m must be 2.
+        The app should force or require m-state trials = 2.</pre>
+<pre class="formula-block">Length of the Sequence
+    Enter n, the total sequence length.</pre>
+<pre class="formula-block">Length of the Longest Run
+    Enter k, the run length of interest.
+    The app reports probabilities involving L_n at this k.</pre>
+<pre class="formula-block">Enter the probability Pi
+    Used only in the unconditional case.
+    Opens a probability-entry window.
+    Enter one probability for each state.
+    The probabilities must be nonnegative and sum to 1.</pre>
+<pre class="formula-block">    Default probabilities are equal:
+        [1/m, 1/m, ..., 1/m]</pre>
+<pre class="formula-block">    Example for m = 3:
+        Pi = [0.3 0.5 0.2]</pre>
+<pre class="formula-block">Number of selected-state occurrences N
+    Used only in the conditional case.
+    Enter N, the total number of occurrences of the selected
+    state in the whole sequence.</pre>
+<pre class="formula-block">    N must be an integer from 0 to n.</pre>
+<pre class="example-block">    Example:
+        n = 20
+        selected state = 1
+        N = 8</pre>
+<pre class="formula-block">    This means the app computes probabilities conditional on
+    exactly eight 1s occurring in the sequence.</pre>
+<pre class="formula-block">Selected-state input
+    Used when Selected states is chosen.
+    Also used in the conditional case.</pre>
+<pre class="formula-block">    In the unconditional case:
+        Enter one integer state index from 1 to m.</pre>
+<pre class="formula-block">    In the conditional case:
+        Enter 1 or 2 only.</pre>
+<pre class="example-block">    Example:
+        2</pre>
+<pre class="formula-block">    This means: compute the longest run of state 2 only.</pre></div>
+</details>
+</section><section class="section-card" id="how-to-use-the-app-unconditional-case">
+<details>
+<summary>How To Use The App: Unconditional Case</summary>
+<div class="section-body"><pre class="example-block">Step 1. Click Clear all items
+    This starts from a clean screen.</pre>
+<pre class="example-block">Step 2. Select Unconditional
+    Use this when trials are independent with probabilities Pi.</pre>
+<pre class="example-block">Step 3. Enter m-state trials
+    Example:
+        m = 3</pre>
+<pre class="example-block">Step 4. Enter Length of the Sequence
+    Example:
+        n = 30</pre>
+<pre class="example-block">Step 5. Enter Length of the Longest Run
+    Example:
+        k = 5</pre>
+<pre class="example-block">Step 6. Click Enter the probability Pi
+    A probability-entry window opens.
+    If m = 3, enter three probabilities.</pre>
+<pre class="example-block">    Example:
+        P(State 1) = 0.3
+        P(State 2) = 0.5
+        P(State 3) = 0.2</pre>
+<pre class="formula-block">    Then click Save.</pre>
+<pre class="example-block">Step 7. Select one run mode</pre>
+<pre class="formula-block">    A. Select All the states
+       Use this when the longest run can be from any state.
+       No selected-state number is needed.</pre>
+<pre class="formula-block">    B. Select Selected states
+       Use this when the longest run should be computed for
+       one specified state only.
+       Enter the selected state number in the selected-state box.</pre>
+<pre class="example-block">Step 8. Click Calculate the Probability
+    The app computes and displays the probability results.</pre></div>
+</details>
+</section><section class="section-card" id="how-to-use-the-app-conditional-case">
+<details>
+<summary>How To Use The App: Conditional Case</summary>
+<div class="section-body"><pre class="example-block">Step 1. Click Clear all items</pre>
+<pre class="example-block">Step 2. Select Conditional
+    This case is only for two-state trials.
+    The app should force m-state trials to 2.</pre>
+<pre class="example-block">Step 3. Enter Length of the Sequence
+    Example:
+        n = 20</pre>
+<pre class="example-block">Step 4. Enter Length of the Longest Run
+    Example:
+        k = 4</pre>
+<pre class="example-block">Step 5. Enter selected state
+    Enter 1 or 2.</pre>
+<pre class="example-block">    Example:
+        selected state = 1</pre>
+<pre class="example-block">Step 6. Enter Number of selected-state occurrences N
+    Example:
+        N = 8</pre>
+<pre class="formula-block">    This means there are exactly eight occurrences of the
+    selected state in the full sequence.</pre>
+<pre class="example-block">Step 7. Click Calculate the Probability
+    The app uses Fast_Cond_Longest_Run to compute conditional
+    longest-run probabilities.</pre>
+<pre class="formula-block">Important conditional-case notes:
+    Pi is not used.
+    Enter the probability Pi should be hidden or disabled.
+    All the states is not used.
+    The conditional case is for selected-state runs only.
+    N can be 0, but it cannot be larger than n.</pre></div>
+</details>
+</section><section class="section-card" id="understanding-the-results">
+<details>
+<summary>Understanding The Results</summary>
+<div class="section-body"><p class="guide-label">Let L_n be the longest run length.</p>
+<p class="guide-label">The results panel reports:</p>
+<pre class="formula-block">    P(L_n = k)
+        The probability that the longest run is exactly k.</pre>
+<pre class="formula-block">    P(L_n &lt;= k)
+        The cumulative probability up to k.</pre>
+<pre class="formula-block">    P(L_n &gt;= k)
+        The survival/tail probability at k.</pre>
+<p class="guide-label">Unconditional case:</p>
+<pre class="formula-block">    The app uses:
+        [pmf, cdf, F] = fmci_longest_run_dist(n, Pi, k, mode, selState)</pre>
+<pre class="formula-block">    For Selected states:
+        [pmf, cdf, F] = fmci_longest_run_dist(n, Pi, k, &#x27;&#x27;selected&#x27;&#x27;, selState)</pre>
+<pre class="formula-block">    For All the states:
+        [pmf, cdf, F] = fmci_longest_run_dist(n, Pi, k, &#x27;&#x27;all&#x27;&#x27;, [])</pre>
+<p class="guide-label">Conditional case:</p>
+<pre class="formula-block">    The app uses:
+        probLTk = Fast_Cond_Longest_Run(n, k, N)
+        probLEk = Fast_Cond_Longest_Run(n, k + 1, N)</pre>
+<pre class="formula-block">    Since Fast_Cond_Longest_Run(n, L, N) returns P(L_n &lt; L | N):</pre>
+<pre class="formula-block">        P(L_n &lt; k | N)  = Fast_Cond_Longest_Run(n, k, N)
+        P(L_n &lt;= k | N) = Fast_Cond_Longest_Run(n, k + 1, N)
+        P(L_n = k | N)  = P(L_n &lt;= k | N) - P(L_n &lt; k | N)
+        P(L_n &gt;= k | N) = 1 - P(L_n &lt; k | N)</pre></div>
+</details>
+</section><section class="section-card" id="example-1-unconditional-two-state-all-the-states">
+<details>
+<summary>Example 1: Unconditional, Two-State, All The States</summary>
+<div class="section-body"><pre class="example-block">Question: In 20 binary trials, what is the distribution of
+the longest run of either state?</pre>
+<pre class="example-block">Inputs:
+    Probability case             = Unconditional
+    m-state trials               = 2
+    Length of the Sequence        = 20
+    Length of the Longest Run     = 4
+    Pi                            = [0.5 0.5]
+    Run mode                      = All the states</pre>
+<pre class="example-block">Interpretation:
+    The app considers runs of state 1 and runs of state 2.
+    L_n is the longest identical consecutive run in the
+    whole sequence.</pre>
+<pre class="example-block">Output meaning:
+    P(L_n = 4), P(L_n &lt;= 4), and P(L_n &gt;= 4).</pre></div>
+</details>
+</section><section class="section-card" id="example-2-unconditional-three-state-selected-state">
+<details>
+<summary>Example 2: Unconditional, Three-State, Selected State</summary>
+<div class="section-body"><pre class="example-block">Question: In 30 trials with three possible states, what is
+the distribution of the longest run of state 2 only?</pre>
+<pre class="example-block">Inputs:
+    Probability case             = Unconditional
+    m-state trials               = 3
+    Length of the Sequence        = 30
+    Length of the Longest Run     = 5
+    Pi                            = [0.3 0.5 0.2]
+    Run mode                      = Selected states
+    Selected state                = 2</pre>
+<pre class="example-block">Interpretation:
+    Only consecutive 2s count as a run.
+    States 1 and 3 break the run.</pre>
+<pre class="example-block">Output meaning:
+    P(L_n = 5), P(L_n &lt;= 5), and P(L_n &gt;= 5) for the
+    longest run of state 2.</pre></div>
+</details>
+</section><section class="section-card" id="example-3-unconditional-four-state-unequal-probabilities">
+<details>
+<summary>Example 3: Unconditional, Four-State, Unequal Probabilities</summary>
+<div class="section-body"><pre class="example-block">Question: In 50 trials with four states, what is the
+distribution of the longest run of any identical state?</pre>
+<pre class="example-block">Inputs:
+    Probability case             = Unconditional
+    m-state trials               = 4
+    Length of the Sequence        = 50
+    Length of the Longest Run     = 6
+    Pi                            = [0.1 0.2 0.3 0.4]
+    Run mode                      = All the states</pre>
+<pre class="example-block">Interpretation:
+    Runs of 1s, 2s, 3s, and 4s are all considered.
+    L_n is the largest of those run lengths.</pre></div>
+</details>
+</section><section class="section-card" id="example-4-conditional-two-state-selected-state">
+<details>
+<summary>Example 4: Conditional, Two-State, Selected State</summary>
+<div class="section-body"><pre class="example-block">Question: In 20 two-state trials, conditional on exactly 8
+occurrences of state 1, what is the longest-run probability
+for state 1?</pre>
+<pre class="example-block">Inputs:
+    Probability case             = Conditional
+    m-state trials               = 2
+    Length of the Sequence        = 20
+    Length of the Longest Run     = 4
+    Selected state                = 1
+    Number of occurrences N       = 8</pre>
+<pre class="formula-block">Function calls used by the app:
+    P(L_n &lt; 4 | N=8)  = Fast_Cond_Longest_Run(20, 4, 8)
+    P(L_n &lt;= 4 | N=8) = Fast_Cond_Longest_Run(20, 5, 8)</pre>
+<pre class="example-block">Interpretation:
+    Among all binary sequences of length 20 with exactly eight
+    selected-state occurrences, the app computes the longest run
+    distribution for the selected state.</pre></div>
+</details>
+</section><section class="section-card" id="common-mistakes-to-avoid">
+<details>
+<summary>Common Mistakes To Avoid</summary>
+<div class="section-body"><pre class="formula-block">1. Pi must have exactly m entries in the unconditional case.
+    If m = 4, Pi must have four probabilities.</pre>
+<pre class="formula-block">2. Pi must sum to 1 in the unconditional case.
+    Examples:
+        Valid:   [0.25 0.25 0.25 0.25]
+        Invalid: [0.25 0.25 0.25]
+        Invalid: [0.5 0.5 0.5 0.5]</pre>
+<pre class="formula-block">3. The selected state must be between 1 and m.
+    If m = 3, valid selected states are 1, 2, and 3.
+    In the conditional case, valid selected states are only 1 and 2.</pre>
+<pre class="formula-block">4. The run length k must be positive and no larger than n.
+    If n = 20, use k = 1, 2, ..., 20.</pre>
+<pre class="formula-block">5. If you change m after entering Pi, click Enter the
+   probability Pi again.
+    The probability window should reset to equal default
+    probabilities when the number of states changes.</pre>
+<pre class="formula-block">6. In the conditional case, N must satisfy 0 &lt;= N &lt;= n.
+    N is the total number of selected-state occurrences.</pre>
+<pre class="formula-block">7. In the conditional case, do not enter Pi.
+    Pi is not used because the calculation conditions on N.</pre>
+<pre class="formula-block">8. In the conditional case, do not use All the states.
+    The conditional function is for selected-state longest runs
+    in two-state trials.</pre></div>
+</details>
+</section><section class="section-card" id="eigvalue-vector-button">
+<details>
+<summary>Eigvalue/Vector Button</summary>
+<div class="section-body"><p>The EigValue/vector button is optional.</p>
+<p>In the unconditional case, it is used to inspect the largest eigenvalue and the right eigenvector of the FMCI transition matrix used for the current input case.</p>
+<p>In the conditional case, there is no single fixed transition matrix in the same unconditional sense, because the transition probabilities depend on the remaining number of selected-state occurrences. Therefore, the app should display a clear message in the eigenvalue/vector panel instead of overlapping eigenvalue text.</p>
+<p>The app writes eigenvalue output into one scrollable text area in the eigenvalue/vector panel to avoid overlapping text.</p></div>
+</details>
+</section><section class="section-card" id="clearing-the-app">
+<details>
+<summary>Clearing The App</summary>
+<div class="section-body"><pre class="formula-block">Click Clear all items to remove:
+    input fields
+    saved probability vector Pi
+    selected-state input
+    conditional N input
+    results panel output
+    eigenvalue/vector panel output</pre></div>
+</details>
+</section><section class="section-card" id="closing-the-app">
+<details>
+<summary>Closing The App</summary>
+<div class="section-body"><p>In the web app, switch tabs or close the browser page to leave the Longest Run app.</p></div>
+</details>
+</section>
+      <nav class="page-nav"><a href="scan-statistic.html"><small>Previous module</small><strong>← Scan Statistic</strong></a><a href="number-of-runs.html"><small>Next module</small><strong>Number of Runs →</strong></a></nav>
+    </article>
+  </div>
+</main>
+<footer class="footer">FMCI Web App module guide · <a href="../index.html">Return to the home page</a></footer>
+</body>
+</html>

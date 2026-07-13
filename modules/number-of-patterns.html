@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Calculate exact probabilities for the number of occurrences of one or more patterns in a finite sequence.">
+<title>Number of Patterns — FMCI Web App Guide</title>
+<link rel="stylesheet" href="../assets/module-pages.css">
+</head>
+<body>
+<header class="topbar">
+  <nav class="nav">
+    <a class="brand" href="../index.html"><span class="brand-mark"></span><span>FMCI Web App</span></a>
+    <div class="navlinks"><a href="../index.html">Home</a><a href="../index.html#methods">All Modules</a><a class="launch" href="https://unshaven-energy-verify.ngrok-free.dev/webapps/home/session.html?app=WuWebAppDesignerWeb2" target="_blank" rel="noopener noreferrer">Launch App ↗</a></div>
+  </nav>
+</header>
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../index.html#methods">Modules</a> / Number of Patterns</div>
+      <div class="eyebrow">Pattern-count distribution</div>
+      <div class="title-row"><div class="module-icon"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="18" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="6" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="18" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="6" cy="18" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="18" r="1.4" fill="currentColor" stroke="none"/><circle cx="18" cy="18" r="1.4" fill="currentColor" stroke="none"/></svg></div><h1>Number of Patterns</h1></div>
+      <p class="hero-summary">Calculate exact probabilities for the number of occurrences of one or more patterns in a finite sequence.</p>
+      <div class="hero-actions"><a class="btn btn-primary" href="https://unshaven-energy-verify.ngrok-free.dev/webapps/home/session.html?app=WuWebAppDesignerWeb2" target="_blank" rel="noopener noreferrer">Open the Web App ↗</a><a class="btn btn-secondary" href="#guide">Read the guide ↓</a></div>
+    </div>
+    <aside class="formula-card"><div class="small">Core result</div><div class="formula">P(Nₙ &lt; r) = P(Wᵣ &gt; n)</div><div class="formula-note">Exact finite-sample calculations based on finite Markov chain imbedding.</div></aside>
+  </div>
+</section>
+<main class="content" id="guide">
+  <div class="overview-grid">
+    <div class="overview-card"><div class="label">What it computes</div><p>P(Nₙ &lt; r) = P(Wᵣ &gt; n)</p></div>
+    <div class="overview-card"><div class="label">Supported models</div><p>Independent or Markov-dependent; multiple patterns supported</p></div>
+    <div class="overview-card"><div class="label">Main inputs</div><p>State count, patterns, threshold r, sequence length n, probabilities</p></div>
+  </div>
+  <div class="layout">
+    <aside class="toc"><h2>On this page</h2><a href="#single-window-web-app-note">Single-window web-app note</a><a href="#purpose-of-this-app">Purpose Of This App</a><a href="#main-inputs">Main Inputs</a><a href="#pattern-entry-format">Pattern Entry Format</a><a href="#counting-options-over-and-non-over">Counting Options: Over And Non-Over</a><a href="#dependency-options">Dependency Options</a><a href="#step-by-step-independent-one-pattern-example">Step-By-Step: Independent One-Pattern Example</a><a href="#step-by-step-independent-r-2-example">STEP-BY-STEP: INDEPENDENT r = 2 EXAMPLE</a><a href="#step-by-step-multiple-pattern-example">Step-By-Step: Multiple-Pattern Example</a><a href="#step-by-step-markov-dependent-example">Step-By-Step: Markov Dependent Example</a><a href="#step-by-step-four-state-dna-style-example">Step-By-Step: Four-State Dna-Style Example</a><a href="#over-vs-non-over-example-in-detail">Over Vs Non-Over Example In Detail</a><a href="#results-panel">Results Panel</a><a href="#eigvalue-vector-button">Eigvalue/Vector Button</a><a href="#clear-all-items">Clear All Items</a><a href="#common-mistakes">Common Mistakes</a><a href="#quick-reference">Quick Reference</a><div class="source-files"><h2>MATLAB routines</h2><span>r_mkv_over_clear_claud.m</span></div></aside>
+    <article class="guide"><section class="section-card" id="single-window-web-app-note">
+<details open>
+<summary>Single-window web-app note</summary>
+<div class="section-body"><p>The original desktop instructions sometimes refer to buttons that open separate input windows. In this single-window web version, enter those same values directly in the text boxes or tables on the current tab. The mathematical meaning of the inputs and outputs is unchanged.</p></div>
+</details>
+</section><section class="section-card" id="purpose-of-this-app">
+<details open>
+<summary>Purpose Of This App</summary>
+<div class="section-body"><p>This app computes exact probabilities for the number of occurrences of one or more patterns in a finite sequence. The sequence has S possible states, labeled 1, 2, ..., S. A pattern is a finite string of these state labels.</p>
+<p class="guide-label">The main probability reported by the app is:</p>
+<pre class="formula-block">    P(N_n &lt; r)</pre>
+<p>where N_n is the number of selected pattern occurrences in the first n trials, and r is the occurrence threshold entered in the box labeled r. Equivalently, this is the waiting-time probability:</p>
+<pre class="formula-block">    P(W_r &gt; n)</pre>
+<p>where W_r is the waiting time until the r-th occurrence of any entered pattern. Therefore, if the app reports Probability = 0.72, this means there is probability 0.72 that the r-th occurrence has not happened by time n.</p>
+<p class="guide-label">The complementary probability is:</p>
+<pre class="formula-block">    P(N_n &gt;= r) = P(W_r &lt;= n) = 1 - Probability</pre>
+<p>This complement is often the probability that at least r occurrences have appeared by time n.</p></div>
+</details>
+</section><section class="section-card" id="main-inputs">
+<details>
+<summary>Main Inputs</summary>
+<div class="section-body"><p>1. m-state trials Enter the number of possible states S.</p>
+<p class="guide-label">The valid state labels are:</p>
+<pre class="formula-block">       1, 2, ..., S</pre>
+<pre class="example-block">   Example:
+       If S = 2, patterns can use only symbols 1 and 2.
+       If S = 4, patterns can use only symbols 1, 2, 3, and 4.</pre>
+<pre class="formula-block">   Important:
+       Do not use 0 as a state label in this app unless the function has
+       been specially modified. The standard format uses 1-based labels.</pre>
+<p>2. Number of Patterns Enter the number L of different patterns to be studied.</p>
+<pre class="example-block">   Example:
+       If L = 1, you will enter one pattern, such as:
+           1 2 1</pre>
+<pre class="formula-block">       If L = 3, you will enter three patterns, such as:
+           1 1
+           2 2
+           1 2 1</pre>
+<p>After entering L, click Enter The Patterns.</p>
+<p>3. r Enter the occurrence threshold r.</p>
+<p class="guide-label">The app computes:</p>
+<pre class="formula-block">       P(N_n &lt; r)</pre>
+<pre class="formula-block">   Examples:
+       r = 1 means the probability that no entered pattern occurs by time n.
+       r = 2 means the probability that the total number of occurrences is
+             0 or 1 by time n.
+       r = 3 means the probability that the total number of occurrences is
+             0, 1, or 2 by time n.</pre>
+<p>If you want the probability that at least r occurrences happen by time n, use:</p>
+<pre class="formula-block">       1 - Probability</pre>
+<p>4. Length of Sequence Enter n, the sequence length or time point.</p>
+<pre class="example-block">   Example:
+       n = 20 means the app studies the first 20 trials of the sequence.</pre></div>
+</details>
+</section><section class="section-card" id="pattern-entry-format">
+<details>
+<summary>Pattern Entry Format</summary>
+<div class="section-body"><p>Click Enter The Patterns to open the pattern-entry window. Enter one pattern in each pattern box.</p>
+<p class="guide-label">Use spaces between state labels.</p>
+<p class="guide-label">Correct examples:</p>
+<pre class="formula-block">    1 2 1
+    2 2
+    1 3 2 1</pre>
+<p class="guide-label">For S = 4, a DNA-style coding could be:</p>
+<pre class="formula-block">    A = 1
+    C = 2
+    G = 3
+    T = 4</pre>
+<p class="guide-label">Then the biological pattern A C G would be entered as:</p>
+<pre class="formula-block">    1 2 3</pre>
+<p>After saving the patterns, the main app displays them in the Patterns box. You can also click View the Pattern(s) to check what has been saved.</p></div>
+</details>
+</section><section class="section-card" id="counting-options-over-and-non-over">
+<details>
+<summary>Counting Options: Over And Non-Over</summary>
+<div class="section-body"><p>The app supports two counting conventions.</p>
+<p>1. Over Overlapping occurrences are counted.</p>
+<pre class="example-block">   Example:
+       Sequence: 1 1 1
+       Pattern:  1 1</pre>
+<pre class="formula-block">       Occurrences under Over counting:
+           positions 1-2: 1 1
+           positions 2-3: 1 1</pre>
+<pre class="formula-block">       Total occurrences = 2.</pre>
+<p>2. Non-over Overlapping occurrences are not both counted. After one occurrence is counted, the next occurrence must start after that occurrence ends.</p>
+<pre class="example-block">   Example:
+       Sequence: 1 1 1
+       Pattern:  1 1</pre>
+<pre class="formula-block">       Occurrences under Non-over counting:
+           positions 1-2: 1 1</pre>
+<pre class="formula-block">       The overlapping positions 2-3 occurrence is not counted.
+       Total occurrences = 1.</pre>
+<p>Use Over if overlapping patterns are allowed. Use Non-over if patterns must be separated and cannot share symbols.</p></div>
+</details>
+</section><section class="section-card" id="dependency-options">
+<details>
+<summary>Dependency Options</summary>
+<div class="section-body"><p>The app has two probability models for the sequence.</p>
+<p>1. Independent Each trial is independent and has the same state-probability vector.</p>
+<p class="guide-label">You enter:</p>
+<pre class="formula-block">       P = [P(State 1), P(State 2), ..., P(State S)]</pre>
+<p>The vector must have S entries, all entries must be nonnegative, and the entries must sum to 1.</p>
+<p class="guide-label">Example for S = 2:</p>
+<pre class="formula-block">       P = [0.6 0.4]</pre>
+<p class="guide-label">This means:</p>
+<pre class="formula-block">       P(X_t = 1) = 0.6
+       P(X_t = 2) = 0.4</pre>
+<p class="guide-label">Example for S = 4:</p>
+<pre class="formula-block">       P = [0.25 0.25 0.25 0.25]</pre>
+<p>This gives equal probability to all four states.</p>
+<p>2. Markov Dependent The next state depends on the current state through a transition matrix.</p>
+<p class="guide-label">You must enter two objects:</p>
+<pre class="formula-block">       Initial P
+       Transition P</pre>
+<p class="guide-label">Initial P is the distribution of X_1:</p>
+<pre class="formula-block">       Initial P = [P(X_1=1), P(X_1=2), ..., P(X_1=S)]</pre>
+<p class="guide-label">Transition P is an S-by-S matrix:</p>
+<pre class="formula-block">       Transition P(i,j) = P(X_t = j | X_{t-1} = i)</pre>
+<p>Each row of the transition matrix must sum to 1.</p>
+<p class="guide-label">Example for S = 2:</p>
+<pre class="formula-block">       Initial P = [0.7 0.3]</pre>
+<pre class="formula-block">       Transition P =
+           [0.8  0.2
+            0.4  0.6]</pre>
+<pre class="example-block">   Interpretation:
+       If the current state is 1, then the next state is 1 with probability
+       0.8 and state 2 with probability 0.2.</pre>
+<pre class="formula-block">       If the current state is 2, then the next state is 1 with probability
+       0.4 and state 2 with probability 0.6.</pre></div>
+</details>
+</section><section class="section-card" id="step-by-step-independent-one-pattern-example">
+<details>
+<summary>Step-By-Step: Independent One-Pattern Example</summary>
+<div class="section-body"><pre class="formula-block">Goal:
+    Compute the probability that the pattern 1 2 1 does not occur by time
+    n = 20 in an independent two-state sequence.</pre>
+<p class="guide-label">Mathematically, this is:</p>
+<pre class="formula-block">    P(W_1 &gt; 20) = P(N_20 &lt; 1)</pre>
+<pre class="example-block">Inputs:</pre>
+<pre class="formula-block">    m-state trials       = 2
+    Number of Patterns   = 1
+    r                    = 1
+    Length of Sequence   = 20
+    Counting             = Over
+    Dependency           = Independent
+    Pattern              = 1 2 1
+    Probability P        = [0.5 0.5]</pre>
+<p class="guide-label">Steps:</p>
+<pre class="formula-block">    1. Click Clear all items.
+    2. Enter m-state trials = 2.
+    3. Enter Number of Patterns = 1.
+    4. Enter r = 1.
+    5. Enter Length of Sequence = 20.
+    6. Select Over.
+    7. Select Independent.
+    8. Click Enter The Patterns.
+    9. Enter the pattern:
+           1 2 1
+   10. Click Save.
+   11. Click Enter the probability P.
+   12. Enter:
+           P(State 1) = 0.5
+           P(State 2) = 0.5
+   13. Click Save.
+   14. Click Calculate the Probability.</pre>
+<pre class="example-block">Output interpretation:</pre>
+<pre class="formula-block">    Probability = P(N_20 &lt; 1) = P(no occurrence of 1 2 1 by time 20).</pre>
+<p class="guide-label">The probability of at least one occurrence by time 20 is:</p>
+<pre class="formula-block">    1 - Probability</pre></div>
+</details>
+</section><section class="section-card" id="step-by-step-independent-r-2-example">
+<details>
+<summary>STEP-BY-STEP: INDEPENDENT r = 2 EXAMPLE</summary>
+<div class="section-body"><pre class="formula-block">Goal:
+    Compute the probability that the pattern 1 1 occurs fewer than two times
+    by time n = 15.</pre>
+<pre class="example-block">Inputs:</pre>
+<pre class="formula-block">    m-state trials       = 2
+    Number of Patterns   = 1
+    r                    = 2
+    Length of Sequence   = 15
+    Counting             = Over
+    Dependency           = Independent
+    Pattern              = 1 1
+    Probability P        = [0.6 0.4]</pre>
+<p class="guide-label">Meaning:</p>
+<pre class="formula-block">    The app computes P(N_15 &lt; 2).</pre>
+<p class="guide-label">That includes the cases:</p>
+<pre class="formula-block">    N_15 = 0 occurrences
+    N_15 = 1 occurrence</pre>
+<p class="guide-label">The complement is:</p>
+<pre class="formula-block">    P(N_15 &gt;= 2) = 1 - Probability</pre>
+<p>which is the probability that the pattern 1 1 occurs at least twice by time 15.</p></div>
+</details>
+</section><section class="section-card" id="step-by-step-multiple-pattern-example">
+<details>
+<summary>Step-By-Step: Multiple-Pattern Example</summary>
+<div class="section-body"><pre class="formula-block">Goal:
+    Compute the probability that fewer than three total occurrences of a
+    collection of patterns appear by time n = 30.</pre>
+<pre class="example-block">Inputs:</pre>
+<pre class="formula-block">    m-state trials       = 3
+    Number of Patterns   = 3
+    r                    = 3
+    Length of Sequence   = 30
+    Counting             = Over
+    Dependency           = Independent
+    Probability P        = [0.2 0.5 0.3]</pre>
+<p class="guide-label">Patterns:</p>
+<pre class="formula-block">    Pattern 1: 1 2
+    Pattern 2: 2 3
+    Pattern 3: 3 1 2</pre>
+<p class="guide-label">Steps:</p>
+<ol><li>Enter m-state trials = 3.</li><li>Enter Number of Patterns = 3.</li><li>Enter r = 3.</li><li>Enter Length of Sequence = 30.</li><li>Select Over and Independent.</li><li>Click Enter The Patterns and enter the three patterns above.</li><li>Click Enter the probability P and enter [0.2 0.5 0.3].</li><li>Click Calculate the Probability.</li></ol>
+<pre class="example-block">Output interpretation:</pre>
+<pre class="formula-block">    Probability = P(total number of occurrences of all three patterns &lt; 3).</pre>
+<p>The total count combines all entered patterns. For example, if pattern 1 occurs once and pattern 2 occurs twice by time n, then the total count is 3.</p></div>
+</details>
+</section><section class="section-card" id="step-by-step-markov-dependent-example">
+<details>
+<summary>Step-By-Step: Markov Dependent Example</summary>
+<div class="section-body"><pre class="formula-block">Goal:
+    Compute the probability that the pattern 1 2 1 has not occurred by time
+    n = 25 in a Markov-dependent two-state sequence.</pre>
+<pre class="example-block">Inputs:</pre>
+<pre class="formula-block">    m-state trials       = 2
+    Number of Patterns   = 1
+    r                    = 1
+    Length of Sequence   = 25
+    Counting             = Over
+    Dependency           = Markov Dependent
+    Pattern              = 1 2 1</pre>
+<p class="guide-label">Initial P:</p>
+<pre class="formula-block">    [0.7 0.3]</pre>
+<p class="guide-label">Transition P:</p>
+<pre class="formula-block">    [0.8 0.2
+     0.4 0.6]</pre>
+<p class="guide-label">Steps:</p>
+<pre class="formula-block">    1. Click Clear all items.
+    2. Enter m-state trials = 2.
+    3. Enter Number of Patterns = 1.
+    4. Enter r = 1.
+    5. Enter Length of Sequence = 25.
+    6. Select Over.
+    7. Select Markov Dependent.
+    8. Click Enter The Patterns and enter:
+           1 2 1
+    9. Click Enter the Initial P and enter:
+           0.7   0.3
+   10. Click Enter the Transition P and enter:
+           0.8   0.2
+           0.4   0.6
+   11. Click Calculate the Probability.</pre>
+<pre class="example-block">Output interpretation:</pre>
+<pre class="formula-block">    Probability = P(W_1 &gt; 25) = P(the first occurrence of 1 2 1 happens
+    after time 25).</pre>
+<p class="guide-label">The probability that 1 2 1 occurs at least once by time 25 is:</p>
+<pre class="formula-block">    1 - Probability</pre></div>
+</details>
+</section><section class="section-card" id="step-by-step-four-state-dna-style-example">
+<details>
+<summary>Step-By-Step: Four-State Dna-Style Example</summary>
+<div class="section-body"><p class="guide-label">Suppose the states represent DNA bases:</p>
+<pre class="formula-block">    1 = A
+    2 = C
+    3 = G
+    4 = T</pre>
+<pre class="formula-block">Goal:
+    Compute the probability that the pattern A C G, entered as 1 2 3, does
+    not occur by time n = 100.</pre>
+<pre class="example-block">Inputs:</pre>
+<pre class="formula-block">    m-state trials       = 4
+    Number of Patterns   = 1
+    r                    = 1
+    Length of Sequence   = 100
+    Counting             = Over
+    Dependency           = Independent
+    Pattern              = 1 2 3
+    Probability P        = [0.25 0.25 0.25 0.25]</pre>
+<pre class="example-block">Output interpretation:</pre>
+<pre class="formula-block">    Probability = P(no A C G pattern occurs in the first 100 positions).</pre>
+<p class="guide-label">The probability that A C G occurs at least once is:</p>
+<pre class="formula-block">    1 - Probability</pre></div>
+</details>
+</section><section class="section-card" id="over-vs-non-over-example-in-detail">
+<details>
+<summary>Over Vs Non-Over Example In Detail</summary>
+<div class="section-body"><p class="guide-label">Let the pattern be:</p>
+<pre class="formula-block">    1 1</pre>
+<p class="guide-label">and suppose the sequence begins:</p>
+<pre class="formula-block">    1 1 1 1</pre>
+<p class="guide-label">Under Over counting, the pattern 1 1 occurs at:</p>
+<pre class="formula-block">    positions 1-2
+    positions 2-3
+    positions 3-4</pre>
+<p class="guide-label">so the count is 3.</p>
+<p>Under Non-over counting, the occurrences cannot share symbols. One possible non-overlapping count is:</p>
+<pre class="formula-block">    positions 1-2
+    positions 3-4</pre>
+<p class="guide-label">so the count is 2.</p>
+<p>For highly self-overlapping patterns such as 1 1, 1 1 1, or 1 2 1 2, the choice between Over and Non-over can significantly change the probability.</p></div>
+</details>
+</section><section class="section-card" id="results-panel">
+<details>
+<summary>Results Panel</summary>
+<div class="section-body"><p>After clicking Calculate the Probability, the app displays output in the Results panel.</p>
+<p class="guide-label">Typical output:</p>
+<pre class="formula-block">    Probability = 0.4321
+    Mean = ...</pre>
+<p class="guide-label">The Probability line means:</p>
+<pre class="formula-block">    P(N_n &lt; r) = P(W_r &gt; n)</pre>
+<p>The Mean line is the mean value returned by the FMCI calculation for the same input model and pattern-counting convention.</p>
+<p>The app also prints the inputs used to the MATLAB Command Window. This is helpful for checking that the correct patterns, probabilities, and transition matrix were used.</p></div>
+</details>
+</section><section class="section-card" id="eigvalue-vector-button">
+<details>
+<summary>Eigvalue/Vector Button</summary>
+<div class="section-body"><p>The EigValue/vector button is used for eigenvalue and eigenvector information associated with the FMCI transition matrix. This information is useful for large-n approximations and for checking the structure of the imbedded Markov chain.</p>
+<p>For ordinary probability calculations, you usually only need the Calculate the Probability button.</p></div>
+</details>
+</section><section class="section-card" id="clear-all-items">
+<details>
+<summary>Clear All Items</summary>
+<div class="section-body"><p>Click Clear all items before starting a new example. This clears the visible input boxes. If your version also clears saved pattern and probability data, you should re-enter patterns and probabilities after clearing.</p>
+<p class="guide-label">A safe workflow is:</p>
+<pre class="formula-block">    Clear all items
+    Enter S, L, r, and n
+    Enter patterns
+    Enter probabilities
+    Calculate</pre></div>
+</details>
+</section><section class="section-card" id="common-mistakes">
+<details>
+<summary>Common Mistakes</summary>
+<div class="section-body"><p>1. Using 0 as a state label This app uses states 1, 2, ..., S. For S = 2, use states 1 and 2, not 0 and 1.</p>
+<p>2. Pattern symbol outside the allowed range If S = 3, the pattern 1 4 is invalid because state 4 does not exist.</p>
+<p>3. Probability vector has the wrong length If S = 4, the probability vector must have four entries.</p>
+<pre class="formula-block">4. Probability vector does not sum to 1
+   Example invalid vector:
+       [0.2 0.2 0.2]
+   because it sums to 0.6.</pre>
+<p>5. Transition matrix rows do not sum to 1 In the Markov case, each row of Transition P must sum to 1.</p>
+<p>6. Forgetting to re-enter probabilities after changing S If you change the number of states, re-enter Initial P and Transition P.</p>
+<p>7. Entering the wrong number of patterns If Number of Patterns = 3, fill all three pattern boxes before saving.</p>
+<p>8. Misinterpreting r r is not the length of the pattern. It is the occurrence threshold. Pattern length is determined by how many symbols you type in the pattern entry window.</p>
+<p>9. Misinterpreting the displayed Probability The displayed Probability is P(N_n &lt; r), not P(N_n = r).</p>
+<p>10. Forgetting the complement If you want the probability that at least r occurrences happen by time n, compute 1 - Probability.</p></div>
+</details>
+</section><section class="section-card" id="quick-reference">
+<details>
+<summary>Quick Reference</summary>
+<div class="section-body"><p class="guide-label">Independent case:</p>
+<pre class="formula-block">    Select Independent
+    Enter probability P
+    P has length S and sums to 1</pre>
+<p class="guide-label">Markov dependent case:</p>
+<pre class="formula-block">    Select Markov Dependent
+    Enter Initial P
+    Enter Transition P
+    Each row of Transition P sums to 1</pre>
+<p class="guide-label">Probability interpretation:</p>
+<pre class="formula-block">    Probability = P(N_n &lt; r) = P(W_r &gt; n)</pre>
+<pre class="example-block">Complement:</pre>
+<pre class="formula-block">    1 - Probability = P(N_n &gt;= r) = P(W_r &lt;= n)</pre></div>
+</details>
+</section>
+      <nav class="page-nav"><a href="waiting-time.html"><small>Previous module</small><strong>← Waiting Time</strong></a><a href="scan-statistic.html"><small>Next module</small><strong>Scan Statistic →</strong></a></nav>
+    </article>
+  </div>
+</main>
+<footer class="footer">FMCI Web App module guide · <a href="../index.html">Return to the home page</a></footer>
+</body>
+</html>
