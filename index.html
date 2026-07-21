@@ -579,6 +579,37 @@
       bottom: 10px;
     }
   }
+
+  /* ===== APP LAUNCH COUNTER ===== */
+  .launch-counter {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 13px;
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 10px;
+    background: rgba(0, 21, 56, 0.95);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.20);
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 700;
+  }
+  .launch-counter strong {
+    min-width: 20px;
+    text-align: center;
+    color: #AFCBFF;
+    font-size: 14px;
+  }
+  @media (max-width: 620px) {
+    .launch-counter {
+      right: 10px;
+      bottom: 10px;
+    }
+  }
 </style>
 </head>
 <body id="top">
@@ -875,5 +906,71 @@
 <span>Contact: <a href="mailto:twu@math.msstate.edu">twu@math.msstate.edu</a></span>
 </div>
 </footer>
-<div class="visit-counter" title="Total homepage page views"><span>Visits</span><img alt="FMCI homepage visit count" referrerpolicy="no-referrer-when-downgrade" src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Ffmci-web.github.io%2F&amp;count_bg=%23125DDC&amp;title_bg=%23001538&amp;icon=&amp;icon_color=%23FFFFFF&amp;title=&amp;edge_flat=false"/></div></body>
+<div class="launch-counter" title="Approximate number of unique browsers that launched the FMCI app"><span>App launches:</span><strong id="launch-count">—</strong></div><script>
+(() => {
+  const API_BASE =
+    "https://api.counterapi.dev/v1/fmci-web-github-io/fmci-app-unique-launchers";
+  const STORAGE_KEY = "fmciAppLaunchRecorded";
+  const countElement = document.getElementById("launch-count");
+  const launchButtons = document.querySelectorAll(
+    "a.btn-launch-nav, a.btn-launch-hero"
+  );
+
+  function extractCount(data) {
+    if (typeof data === "number") return data;
+    if (!data || typeof data !== "object") return null;
+    const possibleKeys = ["count", "value", "result"];
+    for (const key of possibleKeys) {
+      if (typeof data[key] === "number") return data[key];
+      if (typeof data[key] === "string" && /^\d+$/.test(data[key])) {
+        return Number(data[key]);
+      }
+    }
+    return null;
+  }
+
+  async function refreshCount() {
+    try {
+      const response = await fetch(API_BASE, { cache: "no-store" });
+      if (!response.ok) throw new Error("Counter request failed");
+      const data = await response.json();
+      const count = extractCount(data);
+      if (count !== null) countElement.textContent = count.toLocaleString();
+    } catch (error) {
+      countElement.textContent = "—";
+    }
+  }
+
+  async function recordLaunchOnce() {
+    if (localStorage.getItem(STORAGE_KEY) === "yes") return;
+
+    try {
+      const response = await fetch(API_BASE + "/up", { cache: "no-store" });
+      if (!response.ok) throw new Error("Counter increment failed");
+      const data = await response.json();
+      localStorage.setItem(STORAGE_KEY, "yes");
+      const count = extractCount(data);
+      if (count !== null) countElement.textContent = count.toLocaleString();
+    } catch (error) {
+      // Do not block access to the app if the counter service is unavailable.
+    }
+  }
+
+  launchButtons.forEach((button) => {
+    button.addEventListener("click", async (event) => {
+      const destination = button.href;
+      event.preventDefault();
+
+      await Promise.race([
+        recordLaunchOnce(),
+        new Promise((resolve) => setTimeout(resolve, 800))
+      ]);
+
+      window.location.href = destination;
+    });
+  });
+
+  refreshCount();
+})();
+</script></body>
 </html>
